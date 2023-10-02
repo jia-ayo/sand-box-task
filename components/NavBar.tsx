@@ -16,6 +16,8 @@ const NavBar = () => {
             src={currentUser.profileImage}
             alt="Profile"
             className="w-10 h-10 rounded-full mr-4"
+            width={10}
+            height={10}
           />
         ) : (
           <div className="w-10 h-10 bg-gray-300 rounded-full mr-4"></div>

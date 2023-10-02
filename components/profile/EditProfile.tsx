@@ -1,17 +1,35 @@
-import React, { useState, useCallback, ChangeEvent } from "react";
+import React, { useState, useCallback, ChangeEvent, useEffect } from "react";
+
 import { signIn } from "next-auth/react";
 import Input from "../ui/Input";
 import toast from "react-hot-toast";
 import axios from "axios";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import useUser from "@/hooks/useUser";
+import { useRouter } from "next/router";
+import ImageUpload from "../ImageUpload";
 
 const EditProfile = () => {
+  const router = useRouter();
   const [profileImage, setProfileImage] = useState<string>("");
   const [bio, setbio] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data: currentUser } = useCurrentUser();
+    const { mutate: mutateFetchedUser } = useUser(currentUser?.id);
+    
+     useEffect(() => {
+       setProfileImage(currentUser?.profileImage);
+         setUsername(currentUser?.username);
+         setName(currentUser?.name);
+       setbio(currentUser?.bio);
+     }, [
+       currentUser?.profileImage,
+       currentUser?.name,
+       currentUser?.username,
+       currentUser?.bio,
+     ]);
 
   const onImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     let reader = new FileReader();
@@ -28,21 +46,22 @@ const EditProfile = () => {
     try {
       setIsLoading(true);
 
-      await axios.post("api/edit", {
+      await axios.patch("/api/edit", {
         name,
         username,
         bio,
         profileImage,
       });
+      mutateFetchedUser();
 
-      toast.success("profile edited.");
+      toast.success("Updated");
+      router.push("/profile");
     } catch (error) {
-      console.log(error);
-      toast.error("Something Went Wrong. ");
+      toast.error("someting went wrong");
     } finally {
       setIsLoading(false);
     }
-  }, [username, name, profileImage, bio]);
+  }, [bio, name, username, profileImage, mutateFetchedUser, router]);
 
   return (
     <>
@@ -74,10 +93,11 @@ const EditProfile = () => {
           value={bio}
           disabled={isLoading}
         />
-        <input
-          type="file"
-          accept=".png, .jpg"
-          onChange={(e) => onImageChange(e)}
+        <ImageUpload
+          value={profileImage}
+          disabled={isLoading}
+          onChange={(image) => setProfileImage(image)}
+          label="Upload Profile Image"
         />
         <div className="my-4">
           <button
