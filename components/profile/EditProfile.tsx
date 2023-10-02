@@ -31,17 +31,7 @@ const EditProfile = () => {
        currentUser?.bio,
      ]);
 
-  const onImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let reader = new FileReader();
-    let file = event.target.files![0];
-
-    reader.onloadend = () => {
-      setProfileImage(reader.result as string);
-    };
-
-    reader.readAsDataURL(file);
-  };
-
+  
   const onSubmit = useCallback(async () => {
     try {
       setIsLoading(true);
