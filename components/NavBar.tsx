@@ -13,7 +13,7 @@ const NavBar = () => {
       <div className="flex items-center">
         {currentUser && currentUser.profileImage ? (
           <Image
-            src={currentUser.profileImage}
+            src={currentUser?.profileImage || "/placeholder.png"}
             alt="Profile"
             className="w-10 h-10 rounded-full mr-4"
             width={10}
